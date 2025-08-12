@@ -1,7 +1,28 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
-    "version": "1.0.0"
+    "name": "examate",
+    "slug": "examate",
+    "version": "1.0.0",
+    "userInterfaceStyle": "auto",
+    "orientation": "portrait",
+    "splash": {
+      "image": null,
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "android": {
+      "splash": {
+        "image": null,
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "ios": {
+      "splash": {
+        "image": null,
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      }
+    }
   }
 }
