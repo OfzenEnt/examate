@@ -90,7 +90,4 @@ router.put("/update-exam/:id", authenticateToken, requireRole(1), async (req, re
     }
 });
 
-
-
-
 export default router;

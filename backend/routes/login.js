@@ -2,7 +2,10 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import pool from '../config/database.js'
 import bcrypt from 'bcrypt'; 
+import dotenv from 'dotenv';
+dotenv.config({'override': true});
 
+console.log("JWT_SECRET:", process.env.JWT_SECRET); 
 
 const router = express.Router();
 

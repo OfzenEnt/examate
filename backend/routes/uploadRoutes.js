@@ -4,12 +4,13 @@ import ExcelJS from 'exceljs';
 import path from 'path';
 import fs from 'fs';
 import pool from '../config/database.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express();
 const upload = multer({ dest: '../uploads/' });
 
 
-router.post('/upload-student-data', upload.single('file'), async (req, res) => {
+router.post('/upload-student-data', authenticateToken,  upload.single('file'), async (req, res) => {
     if (!req.file) {
         return res.status(400).send('No file uploaded.');
     }
@@ -69,7 +70,7 @@ router.post('/upload-student-data', upload.single('file'), async (req, res) => {
 });
 
 
-router.post('/upload-courses-data', upload.single('file'), async(req,res)=>{
+router.post('/upload-courses-data', authenticateToken, upload.single('file'), async(req,res)=>{
     if (!req.file) {
         return res.status(400).send('No file uploaded.');
     }

@@ -6,6 +6,7 @@ import roomRoutes from './routes/roomRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
 import coordinatorRoutes from './routes/coordinatorRoutes.js';
 import sessionalExamRoutes from './routes/sessionalExamRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 // Testing routes
 import testingRoutes from './testing/testingRoutes.js';
@@ -24,6 +25,7 @@ app.use('/api/rooms',roomRoutes);
 app.use('/api/students',studentRoutes);
 app.use('/api/exam-coordinator',coordinatorRoutes);
 app.use('/api/sessional-exam', sessionalExamRoutes);
+app.use('/api/users', userRoutes);
 
 app.get("/api/health", (req,res)=>{
      res.send("Examate API is Running");

@@ -1,4 +1,7 @@
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config({'override':true});
+console.log("JWT_SECRET:", process.env.JWT_SECRET); 
 
 const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -24,6 +27,5 @@ const requireRole = (role) => {
     next();
   };
 };
-
 
 export { authenticateToken, requireRole };
