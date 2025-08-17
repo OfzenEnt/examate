@@ -6,25 +6,14 @@ const router = express.Router();
 
 router.get("/get-faculty", authenticateToken, requireRole(1), async (req, res) => {
     try {
-        let query = 'SELECT * FROM faculty WHERE 1=1';
-        const params = [];
-
-        if (req.query.faculty_dept) {
-            query += ' AND faculty_dept = ?';
-            params.push(req.query.faculty_dept);
-        }
-
-        if (req.query.faculty_programme) {
-            query += ' AND faculty_programme = ?';
-            params.push(req.query.faculty_programme);
-        }
-
-        if (req.query.faculty_campus) {
-            query += ' AND faculty_campus = ?';
-            params.push(req.query.faculty_campus);
-        }
-
-        const [rows] = await pool.query(query, params);
+        const query = `SELECT f.* FROM faculty f 
+                       JOIN faculty_users fu ON f.emp_id = fu.user_id 
+                       WHERE fu.role != 1
+                       AND f.faculty_dept = ? 
+                       AND f.faculty_programme = ? 
+                       AND f.faculty_campus = ?`;
+        
+        const [rows] = await pool.query(query, [req.user.dept, req.user.programme, req.user.campus]);
         res.json({ success: true, faculty: rows });
     } catch (error) {
         console.error('Error fetching faculty:', error);
@@ -48,9 +37,9 @@ router.post("/invigilator-assignment/:room_id/:block", authenticateToken, requir
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Seating record not found' });
         }
-        
         res.json({ success: true, message: 'Invigilator assigned successfully' });
-    } catch (error) {
+    } 
+    catch (error) {
         console.error('Error assigning invigilator:', error);
         res.status(500).json({ error: 'Internal server error' });
     }

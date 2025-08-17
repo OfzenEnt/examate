@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Aug 15, 2025 at 11:13 AM
+-- Generation Time: Aug 16, 2025 at 05:47 PM
 -- Server version: 8.0.42-0ubuntu0.24.04.2
 -- PHP Version: 8.3.6
 
@@ -20,6 +20,19 @@ SET time_zone = "+00:00";
 --
 -- Database: `examate`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `blacklisted_tokens`
+--
+
+CREATE TABLE `blacklisted_tokens` (
+  `id` int NOT NULL,
+  `token_jti` varchar(255) NOT NULL,
+  `expires_at` datetime NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -233,6 +246,28 @@ INSERT INTO `programme` (`programme_alias`, `programme_name`, `campus`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `refresh_tokens`
+--
+
+CREATE TABLE `refresh_tokens` (
+  `id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `expires_at` datetime NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `refresh_tokens`
+--
+
+INSERT INTO `refresh_tokens` (`id`, `user_id`, `token`, `expires_at`, `created_at`) VALUES
+(1, 1005, '36eaa0d7bd335d551de6e7ffe77c810f445bd965422021fb85717963db42ed29', '2025-08-23 22:36:03', '2025-08-16 22:36:03'),
+(2, 1005, 'f7184bd1ce91f4f2855fe119aa2cc88b98c525df4b25909f74f28c3e8b6cdd12', '2025-08-23 22:52:19', '2025-08-16 22:52:18');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `roles`
 --
 
@@ -315,6 +350,14 @@ CREATE TABLE `stud_users` (
 --
 
 --
+-- Indexes for table `blacklisted_tokens`
+--
+ALTER TABLE `blacklisted_tokens`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `token_jti` (`token_jti`),
+  ADD KEY `idx_token_jti` (`token_jti`);
+
+--
 -- Indexes for table `blocks`
 --
 ALTER TABLE `blocks`
@@ -388,6 +431,15 @@ ALTER TABLE `programme`
   ADD KEY `programme_fk2` (`campus`);
 
 --
+-- Indexes for table `refresh_tokens`
+--
+ALTER TABLE `refresh_tokens`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `token` (`token`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_token` (`token`);
+
+--
 -- Indexes for table `roles`
 --
 ALTER TABLE `roles`
@@ -426,6 +478,22 @@ ALTER TABLE `students`
 ALTER TABLE `stud_users`
   ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `user_id` (`user_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `blacklisted_tokens`
+--
+ALTER TABLE `blacklisted_tokens`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `refresh_tokens`
+--
+ALTER TABLE `refresh_tokens`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables

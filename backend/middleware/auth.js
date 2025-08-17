@@ -1,7 +1,5 @@
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-dotenv.config({'override':true});
-console.log("JWT_SECRET:", process.env.JWT_SECRET); 
+import { isTokenBlacklisted } from '../utils/tokenUtils.js';
 
 const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -11,7 +9,11 @@ const authenticateToken = async (req, res, next) => {
   }
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("auth:",decoded);
+    
+    // Check if token is blacklisted
+    if (decoded.jti && await isTokenBlacklisted(decoded.jti)) {
+      return res.status(401).json({ message: 'Token has been invalidated' });
+    }
     req.user = decoded; 
     next();
   } catch (error) {

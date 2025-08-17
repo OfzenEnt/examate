@@ -188,7 +188,6 @@ router.post("/allocate", authenticateToken, requireRole(1), async (req, res) => 
         await pool.query(`INSERT INTO seating(room_id, exam_list, student_list, invigilator_id, block) VALUES(?, ?, ?, ?, ?)
             `,[room_id, course_code, students, invigilator_id || null, block]);
 
-        
         const currentCount = students.length();
         const totalStudents = currentCount + students.length;
         const remainingCapacity = room_capacity - totalStudents;
@@ -200,7 +199,7 @@ router.post("/allocate", authenticateToken, requireRole(1), async (req, res) => 
         } else if (remainingCapacity <= 10) {
             room_status = 1; // completely filled
         }
-        
+
         await pool.query('UPDATE rooms SET room_status = ? WHERE room_id = ?', [room_status, room_id]);
 
         res.json({ success: true, message: 'Room allocated successfully' });
