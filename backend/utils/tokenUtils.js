@@ -1,6 +1,9 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import pool from '../config/database.js';
+import dotenv from 'dotenv';
+
+dotenv.config({"override": true})
 
 const hashRefreshToken = (token) => {
     return crypto.createHash('sha256').update(token).digest('hex');

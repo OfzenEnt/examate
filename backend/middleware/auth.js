@@ -1,5 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { isTokenBlacklisted } from '../utils/tokenUtils.js';
+import dotenv from 'dotenv';
+
+dotenv.config({"override": true})
 
 const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
