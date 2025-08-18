@@ -3,7 +3,7 @@
     "name": "examate",
     "slug": "examate",
     "version": "1.0.0",
-    "userInterfaceStyle": "auto",
+    "userInterfaceStyle": "light",
     "orientation": "portrait",
     "splash": {
       "image": null,

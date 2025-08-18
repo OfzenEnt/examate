@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-import { StatusBar } from "expo-status-bar";
 import { View, Image, Animated } from "react-native";
 
 export const SplashScreen = () => {
@@ -15,7 +14,6 @@ export const SplashScreen = () => {
 
   return (
     <View className="flex-1 justify-center items-center bg-white">
-      <StatusBar style={"dark"} />
       <View className="justify-center">
         <Image
           source={require("../assets/splash.gif")}
