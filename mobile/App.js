@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { useState, useEffect } from "react";
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { DashboardProvider } from "./contexts/DashboardContext";
 import { SplashScreen } from "./screens/SplashScreen";
 import { OnboardingScreen } from "./screens/OnboardingScreen";
 import { LoginScreen } from "./screens/LoginScreen";
@@ -31,10 +32,14 @@ function AppContent() {
 
   const renderDashboard = () => {
     switch (user.role) {
-      case 0:
+      case 2:
         return <InvigilatorDashboard user={user} />;
       case 1:
-        return <ExamCoordinatorDashboard user={user} />;
+        return (
+          <DashboardProvider>
+            <ExamCoordinatorDashboard user={user} />
+          </DashboardProvider>
+        );
       default:
         return <LoginScreen onLogin={login} />;
     }

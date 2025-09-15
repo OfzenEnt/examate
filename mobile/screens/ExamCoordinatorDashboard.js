@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useDashboard } from "../contexts/DashboardContext";
 import {
   View,
   Text,
@@ -7,6 +8,8 @@ import {
   Pressable,
   ScrollView,
   TouchableOpacity,
+  BackHandler,
+  RefreshControl,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { BottomNavBar } from "../components/ui/BottomNavBar";
@@ -14,10 +17,32 @@ import { ExamScreen } from "./ExamScreen";
 import { HallScreen } from "./HallScreen";
 import { ReportsScreen } from "./ReportsScreen";
 import { ProfileScreen } from "./ProfileScreen";
+import { CourseScreen } from "./CourseScreen";
+import { FacultyScreen } from "./FacultyScreen";
+import { StudentScreen } from "./StudentScreen";
+
+import { ExamCard } from "../components/ui/ExamCard";
+import { InvigilatorDashboard } from "./InvigilatorDashboard";
 
 export const ExamCoordinatorDashboard = ({ user, onNavigateToAttendance }) => {
   const { logout } = useAuth();
+  const { dashboardData, loading, refreshDashboard } = useDashboard();
   const [activeTab, setActiveTab] = useState("home");
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    const backAction = () => {
+      if (activeTab === "home") {
+        return false; // Allow app to close
+      } else {
+        setActiveTab("home");
+        return true; // Navigate to home tab
+      }
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+    return () => backHandler.remove();
+  }, [activeTab]);
 
   const quickActions = [
     {
@@ -27,16 +52,28 @@ export const ExamCoordinatorDashboard = ({ user, onNavigateToAttendance }) => {
       itemscolor: "#8440CF",
     },
     {
+      label: "Course Management",
+      icon: "book",
+      color: "bg-green-100",
+      itemscolor: "#059669",
+    },
+    {
+      label: "Faculty Management",
+      icon: "person",
+      color: "bg-orange-100",
+      itemscolor: "#EA580C",
+    },
+    {
       label: "Student Management",
       icon: "school",
       color: "bg-blue-100 ",
       itemscolor: "#0B5895",
     },
     {
-      label: "Invigilator Management",
-      icon: "person",
+      label: "My Invigilations",
+      icon: "visibility",
       color: "bg-indigo-100",
-      itemscolor: "blue",
+      itemscolor: "#4F46E5",
     },
     {
       label: "Reports",
@@ -45,33 +82,17 @@ export const ExamCoordinatorDashboard = ({ user, onNavigateToAttendance }) => {
       itemscolor: "#0D9488",
     },
     {
-      label: "Hall Allocation",
+      label: "Hall Management",
       icon: "business",
       color: "bg-yellow-100",
       itemscolor: "#D97706",
     },
+
     {
       label: "More",
       icon: "more-horiz",
       color: "bg-gray-200",
       itemscolor: "#8440CF",
-    },
-  ];
-
-  const upcomingExams = [
-    {
-      subject: "Artificial Intelligence",
-      code: "AR20 CSE – Semester 4",
-      date: "Aug 15, 2025",
-      time: "10:00 AM – 12:00 PM",
-      initials: "AI",
-    },
-    {
-      subject: "Artificial Intelligence",
-      code: "AR20 CSE – Semester 4",
-      date: "Aug 15, 2025",
-      time: "10:00 AM – 12:00 PM",
-      initials: "ML",
     },
   ];
 
@@ -83,15 +104,40 @@ export const ExamCoordinatorDashboard = ({ user, onNavigateToAttendance }) => {
     switch (activeTab) {
       case "exam":
         return <ExamScreen />;
+      case "course":
+        return <CourseScreen />;
+      case "faculty":
+        return <FacultyScreen />;
+      case "student":
+        return <StudentScreen />;
+
       case "hall":
         return <HallScreen />;
       case "reports":
         return <ReportsScreen />;
+      case "invigilator":
+        return <InvigilatorDashboard user={user} />;
       case "profile":
         return <ProfileScreen user={user} />;
       default:
         return (
-          <ScrollView className="bg-white flex-1 pt-6 p-1">
+          <ScrollView
+            className="bg-white flex-1 pt-6 p-1"
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={async () => {
+                  setRefreshing(true);
+                  await refreshDashboard();
+                  setRefreshing(false);
+                }}
+                colors={['#1D4ED8']}
+                tintColor="#1D4ED8"
+                progressBackgroundColor="#ffffff"
+              />
+            }
+          >
             <View className="flex-row items-center justify-between p-4 mt-10 ">
               <View className="flex-row items-center gap-2">
                 <Image
@@ -100,7 +146,7 @@ export const ExamCoordinatorDashboard = ({ user, onNavigateToAttendance }) => {
                 />
                 <View>
                   <Text className="text-blue-600 font-semibold text-2xl">
-                    Hi Srinivas Reddy!
+                    Hi {user?.name || "Coordinator"}!
                   </Text>
                   <Text className="text-gray-500 text-sm">
                     Streamline Your Entire Examination Process
@@ -124,7 +170,9 @@ export const ExamCoordinatorDashboard = ({ user, onNavigateToAttendance }) => {
                     color={"#8440CF"}
                     className="bg-[#FAF4FC] p-2 rounded-full"
                   />
-                  <Text className="text-3xl font-bold">25</Text>
+                  <Text className="text-3xl font-bold">
+                    {dashboardData.totalExams}
+                  </Text>
                 </View>
                 <Text className="text-gray-500 mt-1 text-lg">
                   Total Active Exams
@@ -138,7 +186,9 @@ export const ExamCoordinatorDashboard = ({ user, onNavigateToAttendance }) => {
                     color={"#458881"}
                     className="bg-[#EDF5FC] p-2 rounded-full"
                   />
-                  <Text className=" text-3xl font-bold">23</Text>
+                  <Text className=" text-3xl font-bold">
+                    {dashboardData.availableHalls}
+                  </Text>
                   <Text className="text-gray-500 mt-1 text-">
                     Available halls{" "}
                   </Text>
@@ -158,6 +208,21 @@ export const ExamCoordinatorDashboard = ({ user, onNavigateToAttendance }) => {
                   <TouchableOpacity
                     key={index}
                     className="w-[30%] bg-white p-3 rounded-xl items-center mb-4 border border-gray-200 "
+                    onPress={() => {
+                      if (item.label === "Exam Management") {
+                        setActiveTab("exam");
+                      } else if (item.label === "Course Management") {
+                        setActiveTab("course");
+                      } else if (item.label === "Hall Management") {
+                        setActiveTab("hall");
+                      } else if (item.label === "Faculty Management") {
+                        setActiveTab("faculty");
+                      } else if (item.label === "Student Management") {
+                        setActiveTab("student");
+                      } else if (item.label === "My Invigilations") {
+                        setActiveTab("invigilator");
+                      }
+                    }}
                   >
                     <View className={`${item.color} p-2 rounded-full mb-2`}>
                       <Icon
@@ -178,43 +243,16 @@ export const ExamCoordinatorDashboard = ({ user, onNavigateToAttendance }) => {
               <Text className="text-blue-600 font-semibold mb-2 text-2xl">
                 Upcoming Exams
               </Text>
-              {upcomingExams.map((exam, index) => (
-                <View
-                  key={index}
-                  className="bg-white rounded-lg p-4 mb-3 border border-gray-100 flex-row items-center"
-                >
-                  <View className="bg-purple-500 w-10 h-10 rounded-full items-center justify-center mr-3">
-                    <Text className="text-white font-semibold">
-                      {exam.initials}
-                    </Text>
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-black font-semibold text-lg">
-                      {exam.subject}
-                    </Text>
-                    <Text className="text-gray-500 text-sm">{exam.code}</Text>
-                    <View className="flex-row items-center mt-1">
-                      <Icon name="calendar-today" size={16} color="#6b7280" />
-                      <Text className="text-sm text-gray-500 ml-1">
-                        {exam.date}
-                      </Text>
-                      <Icon
-                        name="access-time"
-                        size={16}
-                        color="#6b7280"
-                        style={{ marginLeft: 12 }}
-                      />
-                      <Text className="text-sm text-gray-500 ml-1">
-                        {exam.time}
-                      </Text>
-                    </View>
-                  </View>
-                  <View className="bg-gray-200 px-2 py-1 rounded-full ml-2">
-                    <Text className="text-gray-600 text-xs">Upcoming</Text>
-                  </View>
-                </View>
+              {dashboardData.upcomingExams.map((exam, index) => (
+                <ExamCard key={index} exam={exam} />
               ))}
+              {dashboardData.upcomingExams.length === 0 && (
+                <Text className="text-gray-500 text-center py-4">
+                  No upcoming exams
+                </Text>
+              )}
             </View>
+            <View className="h-20" />
           </ScrollView>
         );
     }
